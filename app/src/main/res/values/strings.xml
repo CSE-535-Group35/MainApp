@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">MCProject</string>
+    <string name="page1_title">Capture Image</string>
+    <string name="add_image_button_text">Add image</string>
+    <string name="upload_button_text">Upload</string>
+    <string name="spinner_content_text">Select Category</string>
+    <string name="imageView_content_text">Image Captured</string>
+    <string name="page1_next_text_button">Upload</string>
+    <string name="page2_title">Select Image Category</string>
+    <string name="back_button_title">Back</string>
+    <string name="serverUrl">http://192.168.165.164:5000</string>
+    <string-array name="image_categories">
+        <item>People</item>
+        <item>Business</item>
+        <item>Animals and Plants</item>
+        <item>Things</item>
+        <item>Scenery</item>
+        <item>Material</item>
+        <item>Others</item>
+    </string-array>
+</resources>
