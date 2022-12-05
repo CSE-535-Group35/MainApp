@@ -73,6 +73,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void uploadImage() {
+        //INference for full image
+        /*
+        ByteArrayOutputStream fullStream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 50, fullStream);
+        byte[] fullByteArray = fullStream.toByteArray();
+        String imageData = Base64.encodeToString(fullByteArray, 0);
+        getInference(imageData,0);
+        */
+        //Inference for Quadrant
         Bitmap[] imageQuadrants = new Bitmap[4];
         imageQuadrants[0] = Bitmap.createBitmap(
                 image,
@@ -95,51 +104,55 @@ public class MainActivity extends AppCompatActivity {
                 image.getWidth() / 2, image.getHeight() / 2
         );
 
-        for (int i = 0;i < 0;i +=1){
+        for (int i = 0;i < 4;i +=1){
             Bitmap imageQuadrant = imageQuadrants[i];
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             imageQuadrant.compress(Bitmap.CompressFormat.PNG, 50, stream);
             byte[] byteArray = stream.toByteArray();
             String imageData = Base64.encodeToString(byteArray, 0);
+            getInference(imageData,i);
 
-            try {
-                RequestQueue queue = Volley.newRequestQueue(this);
-                String url = R.string.serverUrl+"/infer";
-                JSONObject jsonBody = new JSONObject();
-                //Quadrant Position
-                jsonBody.put("position",i);
-                jsonBody.put("imageData", imageData);
+        }
+    }
 
-                JsonObjectRequest stringRequest = new JsonObjectRequest(
-                        Request.Method.POST,
-                        url,
-                        jsonBody,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                // Display the first 500 characters of the response string.
-                                Log.i("TAG",response.toString());
-                                String classification = "";
-                                if (response.has("classification")) {
-                                    classification = response.optString("classification").toString();
-                                    saveImageInFile(classification);
-    //                                getSnackBar("Uploaded image to server in folder " + classification);
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                getSnackBar("Server error");
+    private void getInference(String imageData,int i){
+        try {
+            RequestQueue queue = Volley.newRequestQueue(this);
+            String url = R.string.serverUrl+"/infer";
+            JSONObject jsonBody = new JSONObject();
+            //Quadrant Position
+            jsonBody.put("position",i);
+            jsonBody.put("imageData", imageData);
+
+            JsonObjectRequest stringRequest = new JsonObjectRequest(
+                    Request.Method.POST,
+                    url,
+                    jsonBody,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            // Display the first 500 characters of the response string.
+                            Log.i("TAG",response.toString());
+                            String classification = "";
+                            if (response.has("classification")) {
+                                classification = response.optString("classification").toString();
+                                saveImageInFile(classification);
+                                //                                getSnackBar("Uploaded image to server in folder " + classification);
                             }
                         }
-                );
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            getSnackBar("Server error");
+                        }
+                    }
+            );
 
-                // Add the request to the RequestQueue.
-                queue.add(stringRequest);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            // Add the request to the RequestQueue.
+            queue.add(stringRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
