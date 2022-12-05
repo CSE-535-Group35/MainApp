@@ -73,46 +73,73 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void uploadImage() {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG, 50, stream);
-        byte[] byteArray = stream.toByteArray();
-        String imageData = Base64.encodeToString(byteArray, 0);
+        Bitmap[] imageQuadrants = new Bitmap[4];
+        imageQuadrants[0] = Bitmap.createBitmap(
+                image,
+                0, 0,
+                image.getWidth() / 2, image.getHeight() / 2
+        );
+        imageQuadrants[1] = Bitmap.createBitmap(
+                image,
+                image.getWidth() / 2, 0,
+                image.getWidth() / 2, image.getHeight() / 2
+        );
+        imageQuadrants[2] = Bitmap.createBitmap(
+                image,
+                0, image.getHeight() / 2,
+                image.getWidth() / 2, image.getHeight() / 2
+        );
+        imageQuadrants[3] = Bitmap.createBitmap(
+                image,
+                image.getWidth() / 2, image.getHeight() / 2,
+                image.getWidth() / 2, image.getHeight() / 2
+        );
 
-        try {
-            RequestQueue queue = Volley.newRequestQueue(this);
-            String url = R.string.serverUrl+"/infer";
-            JSONObject jsonBody = new JSONObject();
-            jsonBody.put("imageData", imageData);
+        for (int i = 0;i < 0;i +=1){
+            Bitmap imageQuadrant = imageQuadrants[i];
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imageQuadrant.compress(Bitmap.CompressFormat.PNG, 50, stream);
+            byte[] byteArray = stream.toByteArray();
+            String imageData = Base64.encodeToString(byteArray, 0);
 
-            JsonObjectRequest stringRequest = new JsonObjectRequest(
-                    Request.Method.POST,
-                    url,
-                    jsonBody,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            // Display the first 500 characters of the response string.
-                            Log.i("TAG",response.toString());
-                            String classification = "";
-                            if (response.has("classification")) {
-                                classification = response.optString("classification").toString();
-                                saveImageInFile(classification);
-//                                getSnackBar("Uploaded image to server in folder " + classification);
+            try {
+                RequestQueue queue = Volley.newRequestQueue(this);
+                String url = R.string.serverUrl+"/infer";
+                JSONObject jsonBody = new JSONObject();
+                //Quadrant Position
+                jsonBody.put("position",i);
+                jsonBody.put("imageData", imageData);
+
+                JsonObjectRequest stringRequest = new JsonObjectRequest(
+                        Request.Method.POST,
+                        url,
+                        jsonBody,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                // Display the first 500 characters of the response string.
+                                Log.i("TAG",response.toString());
+                                String classification = "";
+                                if (response.has("classification")) {
+                                    classification = response.optString("classification").toString();
+                                    saveImageInFile(classification);
+    //                                getSnackBar("Uploaded image to server in folder " + classification);
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                getSnackBar("Server error");
                             }
                         }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            getSnackBar("Server error");
-                        }
-                    }
-            );
+                );
 
-            // Add the request to the RequestQueue.
-            queue.add(stringRequest);
-        } catch (JSONException e) {
-            e.printStackTrace();
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
