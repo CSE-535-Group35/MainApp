@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/upload"
+        android:id="@+id/next"
         android:layout_width="199dp"
         android:layout_height="72dp"
         android:layout_marginBottom="112dp"
@@ -24,7 +24,7 @@
         android:layout_marginBottom="148dp"
         android:background="#4CAF50"
         android:contentDescription="@string/add_image_button_text"
-        app:layout_constraintBottom_toTopOf="@+id/upload"
+        app:layout_constraintBottom_toTopOf="@+id/next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"

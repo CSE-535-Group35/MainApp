@@ -17,6 +17,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -34,6 +35,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         uploadImageId = findViewById(R.id.imageButton);
         imageViewId = findViewById(R.id.imageView2);
-        View uploadButtonId = findViewById(R.id.upload);
+        View uploadButtonId = findViewById(R.id.next);
 
         someActivityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         uploadImageId.setOnClickListener(v -> addImage());
-        uploadButtonId.setOnClickListener(v -> uploadImage());
+        uploadButtonId.setOnClickListener(v -> nextPage());
     }
 
     private void addImage() {
@@ -72,16 +74,20 @@ public class MainActivity extends AppCompatActivity {
         someActivityResultLauncher.launch(intent);
     }
 
+    private void nextPage() {
+        Intent intent = new Intent(this, ServersActivity.class);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//        byte[] byteArray = stream.toByteArray();
+//        String encodedString = Base64.encodeToString(byteArray, 0);
+//        image.recycle();
+        intent.putExtra("imageData", image);
+        startActivity(intent);
+    }
+
     private void uploadImage() {
-        //INference for full image
-        /*
-        ByteArrayOutputStream fullStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG, 50, fullStream);
-        byte[] fullByteArray = fullStream.toByteArray();
-        String imageData = Base64.encodeToString(fullByteArray, 0);
-        getInference(imageData,0);
-        */
-        //Inference for Quadrant
+//        String servers = ((EditText)findViewById(R.id.serversText)).getText().toString();
+//        String[] serverArr = Arrays.stream(servers.split(",")).map(String::trim).toArray(String[]::new);
         Bitmap[] imageQuadrants = new Bitmap[4];
         imageQuadrants[0] = Bitmap.createBitmap(
                 image,
